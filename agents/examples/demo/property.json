@@ -1491,6 +1491,101 @@
             ]
           }
         ]
+      },
+      {
+        "name": "va_whisper_v2v",
+        "auto_start": true,
+        "nodes": [
+          {
+            "type": "extension",
+            "name": "rtc",
+            "addon": "agora_rtc",
+            "extension_group": "default",
+            "property": {
+              "app_id": "e6351dfd15ed4ccab7295ba287187eb8",
+              "token": "007eJxTYDAR7FdaHKUQsq74+rWu7HdP7/jovY2Y7vpLT3L76pgchjYFhlQzY1PDlLQUQ9PUFJPk5MQkcyNL06REIwtzQwvz1CSLqOK+9IZARobH+x8zMEIhiM/DkJieX5QYb5SVk5eVxMAAAHP1I3Q=",
+              "channel": "agora_2jlnjb",
+              "stream_id": 1234,
+              "remote_stream_id": 194988,
+              "subscribe_audio": true,
+              "publish_audio": true,
+              "publish_data": true,
+              "subscribe_audio_sample_rate": 24000
+            }
+          },
+          {
+            "type": "extension",
+            "name": "stt",
+            "addon": "whisper_asr_python",
+            "extension_group": "stt",
+            "property": {
+              "model_size": "medium",
+              "device": "cuda",
+              "compute_type": "float16",
+              "language": "zh",
+              "sample_rate": 16000,
+              "beam_size": 5
+            }
+          },
+          {
+            "type": "extension",
+            "name": "llm",
+            "addon": "openai_chatgpt_python",
+            "extension_group": "chatgpt",
+            "property": {
+              "api_key": "${env:OPENAI_API_KEY}",
+              "base_url": "${env:OPENAI_API_BASE}",
+              "model": "${env:OPENAI_MODEL}",
+              "frequency_penalty": 0.9,
+              "max_tokens": 512,
+              "prompt": "",
+              "greeting": "",
+              "max_memory_length": 10,
+              "proxy_url": ""
+            }
+          },
+          {
+            "type": "extension",
+            "name": "tts",
+            "addon": "fish_audio_tts",
+            "extension_group": "tts",
+            "property": {
+              "api_key": "${env:FISH_AUDIO_TTS_KEY}",
+              "base_url": "https://api.fish.audio",
+              "model_id": "d8639b5cc95548f5afbcfe22d3ba5ce5",
+              "optimize_streaming_latency": true,
+              "request_timeout_seconds": 30
+            }
+          }
+        ],
+        "connections": [
+          {
+            "extension": "rtc",
+            "audio_frame": [
+              {
+                "name": "pcm_frame",
+                "dest": [
+                  {
+                    "extension": "stt"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "extension": "stt",
+            "data": [
+              {
+                "name": "text_data",
+                "dest": [
+                  {
+                    "extension": "llm"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ],
     "log_level": 3

@@ -1,0 +1,71 @@
+{
+  "type": "extension",
+  "name": "whisper_asr_python",
+  "version": "0.1.0",
+  "dependencies": [
+    {
+      "type": "system",
+      "name": "ten_runtime_python",
+      "version": "0.6"
+    }
+  ],
+  "api": {
+    "property": {
+      "model_size": {
+        "type": "string"
+      },
+      "device": {
+        "type": "string"
+      },
+      "compute_type": {
+        "type": "string"
+      },
+      "model_path": {
+        "type": "string"
+      },
+      "language": {
+        "type": "string"
+      },
+      "sample_rate": {
+        "type": "int64"
+      },
+      "beam_size": {
+        "type": "int64"
+      }
+    },
+    "audio_frame_in": [
+      {
+        "name": "pcm_frame",
+        "property": {}
+      }
+    ],
+    "data_out": [
+      {
+        "name": "text_data",
+        "property": {
+          "time": {
+            "type": "int64"
+          },
+          "duration_ms": {
+            "type": "int64"
+          },
+          "language": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "is_final": {
+            "type": "bool"
+          },
+          "stream_id": {
+            "type": "uint32"
+          },
+          "end_of_segment": {
+            "type": "bool"
+          }
+        }
+      }
+    ]
+  }
+}
