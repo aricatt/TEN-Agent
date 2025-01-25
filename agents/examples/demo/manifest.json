@@ -95,6 +95,11 @@
     },
     {
       "type": "extension",
+      "name": "funasr_asr_python",
+      "version": "=0.1.0"
+    },
+    {
+      "type": "extension",
       "name": "whisper_asr_python",
       "version": "=0.1.0"
     }
