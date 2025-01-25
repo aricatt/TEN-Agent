@@ -1,0 +1,87 @@
+{
+  "type": "extension",
+  "name": "funasr_asr_python",
+  "version": "0.1.0",
+  "dependencies": [
+    {
+      "type": "system",
+      "name": "ten_runtime_python",
+      "version": "0.6"
+    }
+  ],
+  "api": {
+    "property": {
+      "host": {
+        "type": "string"
+      },
+      "port": {
+        "type": "int64"
+      },
+      "is_ssl": {
+        "type": "bool"
+      },
+      "mode": {
+        "type": "string"
+      },
+      "chunk_size": {
+        "type": "string"
+      },
+      "chunk_interval": {
+        "type": "int64"
+      },
+      "sample_rate": {
+        "type": "int64"
+      },
+      "channels": {
+        "type": "int64"
+      }
+    },
+    "audio_frame_in": [
+      {
+        "name": "pcm_frame",
+        "property": {}
+      }
+    ],
+    "cmd_in": [
+      {
+        "name": "on_user_joined",
+        "property": {
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "on_user_left",
+        "property": {
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "on_connection_failure",
+        "property": {}
+      }
+    ],
+    "data_out": [
+      {
+        "name": "text_data",
+        "property": {
+          "text": {
+            "type": "string"
+          },
+          "is_final": {
+            "type": "bool"
+          },
+          "stream_id": {
+            "type": "int64"
+          },
+          "end_of_segment": {
+            "type": "bool"
+          }
+        }
+      }
+    ]
+  }
+}

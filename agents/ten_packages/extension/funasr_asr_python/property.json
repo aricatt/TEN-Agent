@@ -1,0 +1,10 @@
+{
+    "host": "127.0.0.1",
+    "port": 10095,
+    "is_ssl": true,
+    "mode": "2pass",
+    "chunk_size": "0,10,5",
+    "chunk_interval": 10,
+    "sample_rate": 16000,
+    "channels": 1
+}
