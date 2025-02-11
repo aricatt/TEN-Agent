@@ -1537,18 +1537,18 @@
           {
             "type": "extension",
             "name": "llm",
-            "addon": "openai_chatgpt_python",
+            "addon": "deepseek_chat_python",
             "extension_group": "chatgpt",
             "property": {
-              "api_key": "${env:OPENAI_API_KEY}",
-              "base_url": "${env:OPENAI_API_BASE}",
+              "api_key": "${env:DEEPSEEK_API_KEY}",
+              "base_url": "${env:DEEPSEEK_API_BASE}",
               "frequency_penalty": 0.9,
               "greeting": "你好，请以Lucy开头，和我对话，我会回答你的问题。",
               "max_memory_length": 10,
               "max_tokens": 512,
-              "model": "${env:OPENAI_MODEL}",
+              "model": "${env:DEEPSEEK_MODEL}",
               "prompt": "",
-              "proxy_url": "${env:OPENAI_PROXY_URL}"
+              "proxy_url": "${env:DEEPSEEK_PROXY_URL}"
             }
           },
           {

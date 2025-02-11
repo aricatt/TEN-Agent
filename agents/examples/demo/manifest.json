@@ -50,6 +50,11 @@
     },
     {
       "type": "extension",
+      "name": "openai_deepseek_python",
+      "version": "=0.1.0"
+    },
+    {
+      "type": "extension",
       "name": "bingsearch_tool_python",
       "version": "=0.1.0"
     },
