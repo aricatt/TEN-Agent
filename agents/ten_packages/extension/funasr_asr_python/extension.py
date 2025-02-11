@@ -38,7 +38,10 @@ class FunASRExtension(AsyncExtension):
         self.text_buffer = {}  # 格式: {stream_id: {"online": "", "offline": ""}}
         self.last_text_time = {}  # 格式: {stream_id: timestamp}
         self.text_buffer_time = 2.0  # 实时文本的缓冲时间（秒）
-        self.min_text_interval = 0.5  # 最小文本发送间隔（秒）
+        self.min_text_interval = 0.1  # 最小文本发送间隔（秒）
+        # 添加噪音过滤配置
+        self.noise_words = {'啊', '嗯', '呃', 'yah', '啦', '哦', '噢', '嘿', '呀', 'ok'}  # 常见噪音词
+        self.min_text_length = 2  # 最小有效文本长度
 
     async def on_init(self, ten_env: AsyncTenEnv) -> None:
         self.ten_env = ten_env
@@ -178,9 +181,9 @@ class FunASRExtension(AsyncExtension):
         import re
         text = re.sub(r'<\|[^|]+\|>', '', text)
         
-        self.ten_env.log_info(
-            f"funasr got text: [{text}], mode: {mode}, is_final: {is_final}, stream_id: {self.stream_id}"
-        )
+        #self.ten_env.log_info(
+        #    f"funasr got text: [{text}], mode: {mode}, is_final: {is_final}, stream_id: {self.stream_id}"
+        #)
 
         # 根据2pass模式处理
         if mode == "2pass-online":
@@ -194,6 +197,9 @@ class FunASRExtension(AsyncExtension):
             if self.stream_id in self.last_text_time:
                 time_since_last = current_time - self.last_text_time[self.stream_id]
                 if time_since_last >= self.min_text_interval:
+
+                    #self.ten_env.log_info(f"2pass-online text: {text} ")
+                    
                     await self._send_text(text=text, is_final=False, stream_id=self.stream_id)
                     self.last_text_time[self.stream_id] = current_time
             else:
@@ -205,6 +211,9 @@ class FunASRExtension(AsyncExtension):
                 self.text_buffer[self.stream_id]["offline"] = text
                 # 清除在线缓冲
                 self.text_buffer[self.stream_id]["online"] = ""
+
+                #self.ten_env.log_info(f"2pass-offline text: {text} ")
+
                 # 发送最终结果
                 await self._send_text(text=text, is_final=True, stream_id=self.stream_id)
                 # 清理缓冲区
@@ -212,17 +221,85 @@ class FunASRExtension(AsyncExtension):
                 if self.stream_id in self.last_text_time:
                     del self.last_text_time[self.stream_id]
 
+    def _is_valid_text(self, text: str) -> bool:
+        """
+        检查文本是否为有效输入（不是噪音）
+        """
+        # 去除空白字符
+        text = text.strip()
+        
+        # 长度检查
+        if len(text) < self.min_text_length:
+            #self.ten_env.log_info(f"Text too short, filtered: {text}")
+            return False
+            
+        # 噪音词检查
+        if text in self.noise_words:
+            #self.ten_env.log_info(f"Noise word filtered: {text}")
+            return False
+            
+        # 纯标点符号检查
+        if all(char in '。，？！,.?!' for char in text):
+            #self.ten_env.log_info(f"Punctuation only, filtered: {text}")
+            return False
+
+        # 英文短语检查
+        words = text.split()
+        if all(word.replace(',', '').replace('.', '').isascii() and 
+               word.replace(',', '').replace('.', '').isalpha() 
+               for word in words):
+            # 如果全是英文单词，且单词数量在1-3之间，或者是单个字母
+            if 1 <= len(words) <= 3 or (len(words) == 1 and len(words[0]) == 1):
+                self.ten_env.log_info(f"English phrase or single letter filtered: {text}")
+                return False
+            
+        return True
+
+    def _check_and_remove_name(self, text: str) -> tuple[bool, str]:
+        """
+        检查文本是否包含 lucy 称呼，如果有则移除
+        返回: (是否包含称呼, 处理后的文本)
+        """
+        # 统一转换为小写进行检查
+        text_lower = text.lower()
+        name_variations = ["lucy", "露西", "露茜"]
+        
+        # 检查是否包含任意一个称呼
+        for name in name_variations:
+            if name in text_lower:
+                # 找到实际的称呼（保持原始大小写）
+                start_idx = text_lower.find(name)
+                end_idx = start_idx + len(name)
+                actual_name = text[start_idx:end_idx]
+                
+                # 移除称呼和可能跟随的标点符号
+                text = text.replace(actual_name, "").strip()
+                text = text.lstrip(',.，。、 ')
+                return True, text
+                
+        return False, text
+
     async def _send_text(self, text: str, is_final: bool, stream_id: int) -> None:
-        # 只有当文本非空时才发送
-        if not text.strip():
+        # 检查文本是否包含称呼
+        has_name, processed_text = self._check_and_remove_name(text)
+        if not has_name:
+            #self.ten_env.log_info(f"Text without name prefix filtered: {text}")
             return
             
+        # 检查处理后的文本是否有效
+        if not self._is_valid_text(processed_text):
+            return
+            
+        #目前funasr生成的文本开头会有错误的标点符号（如：？和。等），需要去掉
+        processed_text = processed_text.lstrip('。')
+        processed_text = processed_text.lstrip('？')
+       
         stable_data = Data.create("text_data")
         stable_data.set_property_bool(DATA_OUT_TEXT_DATA_PROPERTY_IS_FINAL, is_final)
-        stable_data.set_property_string(DATA_OUT_TEXT_DATA_PROPERTY_TEXT, text)
+        stable_data.set_property_string(DATA_OUT_TEXT_DATA_PROPERTY_TEXT, processed_text)
         stable_data.set_property_int(DATA_OUT_TEXT_DATA_PROPERTY_STREAM_ID, stream_id)
         stable_data.set_property_bool(
             DATA_OUT_TEXT_DATA_PROPERTY_END_OF_SEGMENT, is_final
         )
-        
+        self.ten_env.log_info(f"text: {processed_text}")
         await self.ten_env.send_data(stable_data)

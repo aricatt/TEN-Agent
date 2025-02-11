@@ -1543,7 +1543,7 @@
               "api_key": "${env:OPENAI_API_KEY}",
               "base_url": "${env:OPENAI_API_BASE}",
               "frequency_penalty": 0.9,
-              "greeting": "TEN Agent connected. How can I help you today?",
+              "greeting": "你好，请以Lucy开头，和我对话，我会回答你的问题。",
               "max_memory_length": 10,
               "max_tokens": 512,
               "model": "${env:OPENAI_MODEL}",
@@ -1648,14 +1648,6 @@
             "extension": "llm",
             "cmd": [
               {
-                "name": "flush",
-                "dest": [
-                  {
-                    "extension": "tts"
-                  }
-                ]
-              },
-              {
                 "name": "tool_call",
                 "dest": [
                   {
@@ -1668,9 +1660,6 @@
               {
                 "name": "text_data",
                 "dest": [
-                  {
-                    "extension": "tts"
-                  },
                   {
                     "extension": "message_collector"
                   }
@@ -1691,29 +1680,7 @@
               }
             ]
           },
-          {
-            "extension": "tts",
-            "cmd": [
-              {
-                "name": "flush",
-                "dest": [
-                  {
-                    "extension": "agora_rtc"
-                  }
-                ]
-              }
-            ],
-            "audio_frame": [
-              {
-                "name": "pcm_frame",
-                "dest": [
-                  {
-                    "extension": "agora_rtc"
-                  }
-                ]
-              }
-            ]
-          },
+          
           {
             "extension": "interrupt_detector",
             "cmd": [
