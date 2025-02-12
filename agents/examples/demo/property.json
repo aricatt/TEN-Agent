@@ -1554,12 +1554,12 @@
           {
             "type": "extension",
             "extension_group": "tts",
-            "addon": "siliconflow_tts_python",
+            "addon": "cosy_tts_python",
             "name": "tts",
             "property": {
-              "api_key": "${env:SILICONFLOW_API_KEY}",
-              "model": "FunAudioLLM/CosyVoice2-0.5B",
-              "voice": "FunAudioLLM/CosyVoice2-0.5B:anna",
+              "api_key": "${env:QWEN_API_KEY}",
+              "model": "cosyvoice-v1",
+              "voice": "longxiaochun",
               "sample_rate": 16000
             }
           },
