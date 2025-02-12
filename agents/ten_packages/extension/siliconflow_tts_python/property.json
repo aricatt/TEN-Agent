@@ -1,0 +1,8 @@
+{
+    "api_key": "${env:SILICONFLOW_API_KEY}",
+    "model": "FunAudioLLM/CosyVoice2-0.5B",
+    "voice": "FunAudioLLM/CosyVoice2-0.5B:anna",
+    "sample_rate": 16000,
+    "speed": 1.0,
+    "gain": 0.0
+}

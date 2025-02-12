@@ -1553,15 +1553,14 @@
           },
           {
             "type": "extension",
-            "name": "tts",
-            "addon": "fish_audio_tts",
             "extension_group": "tts",
+            "addon": "siliconflow_tts_python",
+            "name": "tts",
             "property": {
-              "api_key": "${env:FISH_AUDIO_TTS_KEY}",
-              "model_id": "d8639b5cc95548f5afbcfe22d3ba5ce5",
-              "optimize_streaming_latency": true,
-              "request_timeout_seconds": 30,
-              "base_url": "https://api.fish.audio"
+              "api_key": "${env:SILICONFLOW_API_KEY}",
+              "model": "FunAudioLLM/CosyVoice2-0.5B",
+              "voice": "FunAudioLLM/CosyVoice2-0.5B:anna",
+              "sample_rate": 16000
             }
           },
           {
@@ -1648,6 +1647,14 @@
             "extension": "llm",
             "cmd": [
               {
+                "name": "flush",
+                "dest": [
+                  {
+                    "extension": "tts"
+                  }
+                ]
+              },
+              {              
                 "name": "tool_call",
                 "dest": [
                   {
@@ -1661,7 +1668,33 @@
                 "name": "text_data",
                 "dest": [
                   {
+                    "extension": "tts"
+                  },
+                  {
                     "extension": "message_collector"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "extension": "tts",
+            "cmd": [
+              {
+                "name": "flush",
+                "dest": [
+                  {
+                    "extension": "agora_rtc"
+                  }
+                ]
+              }
+            ],
+            "audio_frame": [
+              {
+                "name": "pcm_frame",
+                "dest": [
+                  {
+                    "extension": "agora_rtc"
                   }
                 ]
               }
