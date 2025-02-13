@@ -441,24 +441,6 @@ class OpenAIChatGPTExtension(AsyncLLMBaseExtension):
         # 不添加空内容的消息
         if not message.get("content"):
             return
-
-        # 如果是助手的回复，检查是否已经存在相同的消息
-        if message.get("role") == "assistant":
-            for m in reversed(self.memory):
-                if m.get("role") == "assistant":
-                    # 如果已经存在助手的回复，更新它的内容
-                    m["content"] = message["content"]
-                    return
-
-        # 如果是新消息，先检查是否需要清理历史
-        if message.get("role") == "user":
-            # 如果用户消息内容完全不同，清空历史
-            if len(self.memory) > 0 and self.memory[-1].get("role") == "user":
-                prev_content = self.memory[-1].get("content", "").lower()
-                curr_content = message.get("content", "").lower()
-                # 如果两个消息的相似度很低，清空历史
-                if len(set(prev_content) & set(curr_content)) / len(set(prev_content + curr_content)) < 0.3:
-                    self.memory.clear()
         
         # 添加新消息
         self.memory.append(message)
